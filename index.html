@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista de la compra</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 16px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 480px;
+      margin: auto;
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 8px 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      gap: 8px;
+    }
+    li.comprado span {
+      color: green;
+      font-weight: 600;
+    }
+    .actions {
+      display: flex;
+      gap: 6px;
+    }
+    .delete {
+      background: #e74c3c;
+      color: white;
+    }
+    .check {
+      background: #2ecc71;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛒 Lista de la compra</h1>
+    <form id="form">
+      <input id="itemInput" type="text" placeholder="Añadir producto" required />
+      <button type="submit">+</button>
+    </form>
+    <ul id="list"></ul>
+  </div>
+
+  <script>
+    const form = document.getElementById('form');
+    const input = document.getElementById('itemInput');
+    const list = document.getElementById('list');
+
+    let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
+
+    function render() {
+      list.innerHTML = '';
+      items.forEach((item, index) => {
+        const li = document.createElement('li');
+        if (item.comprado) li.classList.add('comprado');
+
+        li.innerHTML = `
+          <span>${item.text}</span>
+          <div class="actions">
+            <button class="check">✔</button>
+            <button class="delete">✕</button>
+          </div>
+        `;
+
+        li.querySelector('.check').onclick = () => {
+          item.comprado = !item.comprado;
+          save();
+        };
+
+        li.querySelector('.delete').onclick = () => {
+          items.splice(index, 1);
+          save();
+        };
+
+        list.appendChild(li);
+      });
+    }
+
+    function save() {
+      localStorage.setItem('shoppingList', JSON.stringify(items));
+      render();
+    }
+
+    form.onsubmit = e => {
+      e.preventDefault();
+      items.push({ text: input.value.trim(), comprado: false });
+      input.value = '';
+      save();
+    };
+
+    render();
+  </script>
+</body>
+</html>
